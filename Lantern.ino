@@ -3,7 +3,7 @@
   #include <avr/power.h>
 #endif
 
-#define PIN 0
+#define PIN 6
 
 // Parameter 1 = number of pixels in strip
 // Parameter 2 = Arduino pin number (most are valid)
@@ -28,7 +28,23 @@ void setup() {
 }
 
 void loop() {
-  test();
+  fire(1000);
+}
+
+void fire(uint16_t duration)
+{
+  unsigned long stopTime = millis() + duration;
+  byte rand;
+  while(millis()<=stopTime)
+  {
+    for (int i=0; i < strip.numPixels(); i++)
+    {
+      rand = random(10,100);
+      strip.setPixelColor(i,rand,rand * 0.75,0);
+    }
+    show();
+    delay(random(20));
+  }
 }
 
 void test() {
