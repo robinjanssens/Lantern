@@ -37,6 +37,10 @@ void setup() {
 }
 
 void loop() {
+  test();
+}
+
+void test() {
   int i = 0;
   while(i==0) {
     i = 1;
@@ -65,7 +69,7 @@ void loop() {
     show();
     delay(1000);
   }
-  
+
   // Some example procedures showing how to display to the pixels:
   colorWipe(strip.Color(255, 0, 0), 50); // Red
   colorWipe(strip.Color(0, 255, 0), 50); // Green
