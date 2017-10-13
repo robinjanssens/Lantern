@@ -3,7 +3,7 @@
   #include <avr/power.h>
 #endif
 
-#define PIN 6
+#define PIN 0
 
 // Parameter 1 = number of pixels in strip
 // Parameter 2 = Arduino pin number (most are valid)
@@ -15,8 +15,6 @@
 //   NEO_RGBW    Pixels are wired for RGBW bitstream (NeoPixel RGBW products)
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(301, PIN, NEO_GRB + NEO_KHZ800);
 Adafruit_NeoPixel remappedStrip = Adafruit_NeoPixel(300, PIN, NEO_GRB + NEO_KHZ800);
-
-byte screen[12][26][3];
 
 // IMPORTANT: To reduce NeoPixel burnout risk, add 1000 uF capacitor across
 // pixel power leads, add 300 - 500 Ohm resistor on first pixel's data input
@@ -30,7 +28,6 @@ void setup() {
   #endif
   // End of trinket special code
 
-  Serial.begin(9600);
   strip.begin();
   remappedStrip.begin();
   show(); // Initialize all pixels to 'off'
@@ -41,35 +38,6 @@ void loop() {
 }
 
 void test() {
-  int i = 0;
-  while(i==0) {
-    i = 1;
-    for(int x=0;x<12;x++) {
-      for(int y=0;y<26;y++) {
-        for(int c=0;c<3;c++) {
-          screen[x][y][c] = 0;
-        }
-      }
-    }
-    for(int x=0;x<12;x++) {
-      for(int y=0;y<26;y++) {
-        screen[x][y][2] = 255;
-      }
-    }
-    for(int x=0;x<12;x++) {
-      for(int y=0;y<26;y++) {
-        strip.setPixelColor(x*12+y, strip.Color(screen[x][y][0],screen[x][y][1],screen[x][y][2]));
-        Serial.print(screen[x][y][0]);
-        Serial.print(screen[x][y][1]);
-        Serial.print(screen[x][y][2]);
-        Serial.print(" ");
-      }
-    }
-    Serial.println(" - show");
-    show();
-    delay(1000);
-  }
-
   // Some example procedures showing how to display to the pixels:
   colorWipe(strip.Color(255, 0, 0), 50); // Red
   colorWipe(strip.Color(0, 255, 0), 50); // Green
