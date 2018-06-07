@@ -83,38 +83,6 @@ void police() {
   }
 }
 
-//void rotation2() {
-//  float one = 1;
-//  for (float offset=0; offset<=1; offset=offset+0.01) {
-//    for (uint16_t led=0; led<300; led++) {
-//      float value = positions[led][1]/max_width;  // 0 -> 1
-//      if ((value+offset>0 && value+offset<=0.25) || (value+offset>1 && value+offset<=1.25)) {
-//        float value2 = 4*fmod(value,1);
-//        remappedStrip.setPixelColor(led, strip.Color(0, 0, 32*value2));
-//      }
-//      else if ((value+offset>0.25 && value+offset<0.5) || (value+offset>1.25 && value+offset<1.5)) {
-//        float value2 = -4*fmod(value,1)+2;
-//        remappedStrip.setPixelColor(led, strip.Color(0, 0, 32*value2));
-//      }
-//      else {
-//        remappedStrip.setPixelColor(led, strip.Color(0, 0, 0));
-//      }
-//    }
-//    remappedStrip.show();
-//    delay(5);
-//  }
-//}
-
-//void rotation() {
-//  for (float offset=0; offset<=1; offset=offset+0.01) {
-//    for (uint16_t led=0; led<300; led++) {
-//      remappedStrip.setPixelColor(led, strip.Color(0, 0, 32*(1-cos(2*PI*(positions[led][1]/max_width+offset)))/2));
-//    }
-//    remappedStrip.show();
-//    delay(5);
-//  }
-//}
-
 void rowtest(uint16_t duration) {
   for (uint8_t row=0; row<=24; row++) {     // row iterator
     for (uint8_t i=0; i<=24; i++) {     // row iterator
