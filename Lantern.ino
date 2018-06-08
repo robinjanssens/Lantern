@@ -46,7 +46,8 @@ void loop() {
     // rowtest(500);
 //    columntest(500);
 //  rotation();
-  police();
+//  police();
+rainbow();
 //  }
 }
 
@@ -79,6 +80,39 @@ void police() {
         uint8_t value2 = 255-cosinus_table[(2*value)%256];
         remappedStrip.setPixelColor(led, strip.Color(value2/8, 0, 0));
       }
+    }
+    remappedStrip.show();
+    delay(5);
+  }
+}
+
+void rainbow() {
+  for (uint8_t offset=0; offset<=255; offset++) {
+    for (uint16_t led=0; led<300; led++) {
+      uint8_t value = positions[led][1]+offset;  // 0 -> 255 (automatically modulo 256)
+      uint8_t red, green, blue;
+      if (value<171) {
+        red = 255-cosinus_table[round(1.5*value)%256];
+      }
+      else {
+        red = 0;
+      }
+      if (value>85) {
+        green = 255-cosinus_table[round(1.5*(value-85))%256];
+      }
+      else {
+        green = 0;
+      }
+      if (value<85) {
+        blue =  255-cosinus_table[round(1.5*(value+85))%256];
+      }
+      else if (value>171) {
+        blue =  255-cosinus_table[round(1.5*(value-171))%256];
+      }
+      else {
+        blue = 0;
+      }
+      remappedStrip.setPixelColor(led, strip.Color(red/8, green/8, blue/8));
     }
     remappedStrip.show();
     delay(5);
@@ -143,21 +177,21 @@ void fire(uint16_t duration) {
   }
 }
 
-void test() {
-  // Some example procedures showing how to display to the pixels:
-  colorWipe(strip.Color(255, 0, 0), 50); // Red
-  colorWipe(strip.Color(0, 255, 0), 50); // Green
-  colorWipe(strip.Color(0, 0, 255), 50); // Blue
-//colorWipe(strip.Color(0, 0, 0, 255), 50); // White RGBW
-  // Send a theater pixel chase in...
-  theaterChase(strip.Color(127, 127, 127), 50); // White
-  theaterChase(strip.Color(127, 0, 0), 50); // Red
-  theaterChase(strip.Color(0, 0, 127), 50); // Blue
-
-  rainbow(20);
-  rainbowCycle(20);
-  theaterChaseRainbow(50);
-}
+//void test() {
+//  // Some example procedures showing how to display to the pixels:
+//  colorWipe(strip.Color(255, 0, 0), 50); // Red
+//  colorWipe(strip.Color(0, 255, 0), 50); // Green
+//  colorWipe(strip.Color(0, 0, 255), 50); // Blue
+////colorWipe(strip.Color(0, 0, 0, 255), 50); // White RGBW
+//  // Send a theater pixel chase in...
+//  theaterChase(strip.Color(127, 127, 127), 50); // White
+//  theaterChase(strip.Color(127, 0, 0), 50); // Red
+//  theaterChase(strip.Color(0, 0, 127), 50); // Blue
+//
+//  rainbow(20);
+//  rainbowCycle(20);
+//  theaterChaseRainbow(50);
+//}
 
 // Fill the dots one after the other with a color
 void colorWipe(uint32_t c, uint8_t wait) {
@@ -168,17 +202,17 @@ void colorWipe(uint32_t c, uint8_t wait) {
   }
 }
 
-void rainbow(uint8_t wait) {
-  uint16_t i, j;
-
-  for(j=0; j<256; j++) {
-    for(i=0; i<strip.numPixels(); i++) {
-      strip.setPixelColor(i, Wheel((i+j) & 255));
-    }
-    show();
-    delay(wait);
-  }
-}
+//void rainbow(uint8_t wait) {
+//  uint16_t i, j;
+//
+//  for(j=0; j<256; j++) {
+//    for(i=0; i<strip.numPixels(); i++) {
+//      strip.setPixelColor(i, Wheel((i+j) & 255));
+//    }
+//    show();
+//    delay(wait);
+//  }
+//}
 
 // Slightly different, this makes the rainbow equally distributed throughout
 void rainbowCycle(uint8_t wait) {
