@@ -1,7 +1,5 @@
-#include <Adafruit_NeoPixel.h>
-#ifdef __AVR__
-  #include <avr/power.h>
-#endif
+
+#include "neopixel.h"
 
 #define PIN D6
 
@@ -19,8 +17,10 @@ const uint8_t cosinus_table[256] = { 255, 255, 255, 255, 254, 254, 254, 253, 253
 //   NEO_GRB     Pixels are wired for GRB bitstream (most NeoPixel products)
 //   NEO_RGB     Pixels are wired for RGB bitstream (v1 FLORA pixels, not v2)
 //   NEO_RGBW    Pixels are wired for RGBW bitstream (NeoPixel RGBW products)
-Adafruit_NeoPixel strip = Adafruit_NeoPixel(301, PIN, NEO_GRB + NEO_KHZ800);
-Adafruit_NeoPixel remappedStrip = Adafruit_NeoPixel(300, PIN, NEO_GRB + NEO_KHZ800);
+// Adafruit_NeoPixel strip = Adafruit_NeoPixel(301, PIN, NEO_GRB + NEO_KHZ800);
+// Adafruit_NeoPixel remappedStrip = Adafruit_NeoPixel(300, PIN, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel strip(301, PIN, WS2812B);
+Adafruit_NeoPixel remappedStrip(300, PIN, WS2812B);
 
 uint8_t matrix[25][12][3]; // rows, columns, color
 
@@ -92,22 +92,22 @@ void rainbow() {
       uint8_t value = positions[led][1]+offset;  // 0 -> 255 (automatically modulo 256)
       uint8_t red, green, blue;
       if (value<171) {
-        red = 255-cosinus_table[round(1.5*value)%256];
+        red = 255-cosinus_table[(int)round(1.5*value)%256];
       }
       else {
         red = 0;
       }
       if (value>85) {
-        green = 255-cosinus_table[round(1.5*(value-85))%256];
+        green = 255-cosinus_table[(int)round(1.5*(value-85))%256];
       }
       else {
         green = 0;
       }
       if (value<85) {
-        blue =  255-cosinus_table[round(1.5*(value+85))%256];
+        blue =  255-cosinus_table[(int)round(1.5*(value+85))%256];
       }
       else if (value>171) {
-        blue =  255-cosinus_table[round(1.5*(value-171))%256];
+        blue =  255-cosinus_table[(int)round(1.5*(value-171))%256];
       }
       else {
         blue = 0;
