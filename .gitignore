@@ -8,3 +8,8 @@
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# ------------------------------
+# Particle specific
+# ------------------------------
+*.bin
