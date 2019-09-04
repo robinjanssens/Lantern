@@ -1,5 +1,6 @@
 // This #include statement was automatically added by the Particle IDE.
 #include <neopixel.h>
+#include "Background.h"
 
 #define PIN D6
 
@@ -35,6 +36,8 @@ Adafruit_NeoPixel strip(301, PIN, WS2812B);
 Adafruit_NeoPixel remappedStrip(300, PIN, WS2812B);
 
 uint8_t matrix[25][12][3]; // rows, columns, color
+
+Background background(&remappedStrip, &x_offset);
 
 // IMPORTANT: To reduce NeoPixel burnout risk, add 1000 uF capacitor across
 // pixel power leads, add 300 - 500 Ohm resistor on first pixel's data input
@@ -88,76 +91,27 @@ void setup() {
 void loop() {
   switch (state) {
   case rainbow:
-    rainbow_background();
+    background.rainbow();
     x_offset++; // increment x offset
     delay(5);   // wait for 5ms
     break;
   case police:
-    police_background();
+    background.police();
     x_offset++; // increment x offset
-    delay(5);
+    delay(1);
     break;
   case fire:
-    fire_background();
+    background.fire();
     delay(random(20));
     break;
   case off:
-    solid_background(0,0,0);
+    background.solid(0,0,0);
     delay(100);  // wait 100ms
     break;
   default:
     state = rainbow;
     break;
   }
-}
-
-// ------------------------------
-// Backgrounds
-// ------------------------------
-
-void rainbow_background() {
-  uint8_t value;
-  uint8_t red, green, blue;
-  for (uint16_t led=0; led<300; led++) {
-    value = positions[led][1]+x_offset;  // 0 -> 255 (automatically modulo 256)
-    red=rainbow_wave_table[value];
-    green=rainbow_wave_table[(value+85)%256];
-    blue=rainbow_wave_table[(value+171)%256];
-    remappedStrip.setPixelColor(led, strip.Color(red/8, green/8, blue/8));
-  }
-  remappedStrip.show();
-}
-
-void police_background() {
-  uint8_t value, value2;
-  for (uint16_t led=0; led<300; led++) {
-    value = positions[led][1]+x_offset;  // 0 -> 255 (automatically modulo 256)
-    if (value>0 && value<128) {
-      value2 = 255-cosinus_table[2*value];
-      remappedStrip.setPixelColor(led, strip.Color(0, 0, value2/8));
-    }
-    else {
-      value2 = 255-cosinus_table[(2*value)%256];
-      remappedStrip.setPixelColor(led, strip.Color(value2/8, 0, 0));
-    }
-  }
-  remappedStrip.show();
-}
-
-void fire_background() {
-  uint8_t rand;
-  for (uint16_t led=0; led<300; led++) {
-    rand = random(10,100);
-    remappedStrip.setPixelColor(led, strip.Color(rand, rand*0.75, 0));
-  }
-  remappedStrip.show();
-}
-
-void solid_background(uint8_t red, uint8_t green, uint8_t blue) {
-  for (uint16_t led=0; led<300; led++) {
-    remappedStrip.setPixelColor(led, strip.Color(red, green, blue));
-  }
-  remappedStrip.show();
 }
 
 // ------------------------------
