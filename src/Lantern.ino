@@ -5,7 +5,7 @@
 
 SYSTEM_THREAD(ENABLED);
 
-enum State { rainbow, off } state;
+enum State { rainbow, police, fire, off } state;
 uint8_t x_offset = 0; // automatically rolls over at 256.
 
 // define positions of pixels in reference to first led.
@@ -50,6 +50,16 @@ int setOn(String userInput) {
   return 0;
 }
 
+int setPolice(String userInput) {
+  state = police;
+  return 0;
+}
+
+int setFire(String userInput) {
+  state = fire;
+  return 0;
+}
+
 int setOff(String userInput) {
   state = off;
   return 0;
@@ -63,6 +73,8 @@ void setup() {
   // register the cloud function
   waitUntil(Particle.connected);
   Particle.function("on", setOn);
+  Particle.function("police", setPolice);
+  Particle.function("fire", setFire);
   Particle.function("off", setOff);
   Particle.variable("state",state);
   // code
@@ -80,34 +92,77 @@ void loop() {
     x_offset++; // increment x offset
     delay(5);   // wait for 5ms
     break;
+  case police:
+    police_background();
+    x_offset++; // increment x offset
+    delay(5);
+    break;
+  case fire:
+    fire_background();
+    delay(random(20));
+    break;
   case off:
-    black();
+    solid_background(0,0,0);
     delay(100);  // wait 100ms
     break;
   default:
     state = rainbow;
     break;
   }
-
-  // if ( state == rainbow ) {
-  //   //  char state;
-  //   //  state=Serial.read();
-  //   //  if (state==32){
-  //   //    // off state
-  //   //  }
-  //   //  else {
-  //       // fire(1000);
-  //       // rowtest(500);
-  //   //    columntest(500);
-  //   //  rotation();
-  //   //  police();
-  //   rainbow();
-  //   //  }
-  // } else {
-  //   black();
-  //   delay(100);  // wait 100ms
-  // }
 }
+
+// ------------------------------
+// Backgrounds
+// ------------------------------
+
+void rainbow_background() {
+  uint8_t value;
+  uint8_t red, green, blue;
+  for (uint16_t led=0; led<300; led++) {
+    value = positions[led][1]+x_offset;  // 0 -> 255 (automatically modulo 256)
+    red=rainbow_wave_table[value];
+    green=rainbow_wave_table[(value+85)%256];
+    blue=rainbow_wave_table[(value+171)%256];
+    remappedStrip.setPixelColor(led, strip.Color(red/8, green/8, blue/8));
+  }
+  remappedStrip.show();
+}
+
+void police_background() {
+  uint8_t value, value2;
+  for (uint16_t led=0; led<300; led++) {
+    value = positions[led][1]+x_offset;  // 0 -> 255 (automatically modulo 256)
+    if (value>0 && value<128) {
+      value2 = 255-cosinus_table[2*value];
+      remappedStrip.setPixelColor(led, strip.Color(0, 0, value2/8));
+    }
+    else {
+      value2 = 255-cosinus_table[(2*value)%256];
+      remappedStrip.setPixelColor(led, strip.Color(value2/8, 0, 0));
+    }
+  }
+  remappedStrip.show();
+}
+
+void fire_background() {
+  uint8_t rand;
+  for (uint16_t led=0; led<300; led++) {
+    rand = random(10,100);
+    remappedStrip.setPixelColor(led, strip.Color(rand, rand*0.75, 0));
+  }
+  remappedStrip.show();
+}
+
+void solid_background(uint8_t red, uint8_t green, uint8_t blue) {
+  for (uint16_t led=0; led<300; led++) {
+    remappedStrip.setPixelColor(led, strip.Color(red, green, blue));
+  }
+  remappedStrip.show();
+}
+
+// ------------------------------
+// Obsolete
+// ------------------------------
 
 void rotation() {
   for (uint8_t offset=0; offset<=255; offset++) {
@@ -124,37 +179,6 @@ void rotation() {
     remappedStrip.show();
     delay(5);
   }
-}
-
-void police() {
-  for (uint8_t offset=0; offset<=255; offset++) {
-    for (uint16_t led=0; led<300; led++) {
-      uint8_t value = positions[led][1]+offset;  // 0 -> 255 (automatically modulo 256)
-      if (value>0 && value<128) {
-        uint8_t value2 = 255-cosinus_table[2*value];
-        remappedStrip.setPixelColor(led, strip.Color(0, 0, value2/8));
-      }
-      else {
-        uint8_t value2 = 255-cosinus_table[(2*value)%256];
-        remappedStrip.setPixelColor(led, strip.Color(value2/8, 0, 0));
-      }
-    }
-    remappedStrip.show();
-    delay(5);
-  }
-}
-
-void rainbow_background() {
-  uint8_t value;
-  uint8_t red, green, blue;
-  for (uint16_t led=0; led<300; led++) {
-    value = positions[led][1]+x_offset;  // 0 -> 255 (automatically modulo 256)
-    red=rainbow_wave_table[value];
-    green=rainbow_wave_table[(value+85)%256];
-    blue=rainbow_wave_table[(value+171)%256];
-    remappedStrip.setPixelColor(led, strip.Color(red/8, green/8, blue/8));
-  }
-  remappedStrip.show();
 }
 
 void rainbow_old() {
@@ -233,13 +257,6 @@ void rainbow_old() {
 //   }
 // }
 
-void black() {
-  for (uint16_t led=0; led<300; led++) {
-    remappedStrip.setPixelColor(led, strip.Color(0, 0, 0));
-  }
-  remappedStrip.show();
-}
-
 void rowtest(uint16_t duration) {
   for (uint8_t row=0; row<=24; row++) {     // row iterator
     for (uint8_t i=0; i<=24; i++) {     // row iterator
@@ -283,20 +300,7 @@ void columntest(uint16_t duration) {
   }
 }
 
-void fire(uint16_t duration) {
-  unsigned long stopTime = millis() + duration;
-  byte rand;
-  while(millis()<=stopTime)
-  {
-    for (int i=0; i < strip.numPixels(); i++)
-    {
-      rand = random(10,100);
-      strip.setPixelColor(i,rand,rand * 0.75,0);
-    }
-    show();
-    delay(random(20));
-  }
-}
+
 
 //void test() {
 //  // Some example procedures showing how to display to the pixels:
@@ -334,55 +338,6 @@ void colorWipe(uint32_t c, uint8_t wait) {
 //    delay(wait);
 //  }
 //}
-
-// Slightly different, this makes the rainbow equally distributed throughout
-void rainbowCycle(uint8_t wait) {
-  uint16_t i, j;
-
-  for(j=0; j<256*5; j++) { // 5 cycles of all colors on wheel
-    for(i=0; i< strip.numPixels(); i++) {
-      strip.setPixelColor(i, Wheel(((i * 256 / strip.numPixels()) + j) & 255));
-    }
-    show();
-    delay(wait);
-  }
-}
-
-//Theatre-style crawling lights.
-void theaterChase(uint32_t c, uint8_t wait) {
-  for (int j=0; j<10; j++) {  //do 10 cycles of chasing
-    for (int q=0; q < 3; q++) {
-      for (uint16_t i=0; i < strip.numPixels(); i=i+3) {
-        strip.setPixelColor(i+q, c);    //turn every third pixel on
-      }
-      show();
-
-      delay(wait);
-
-      for (uint16_t i=0; i < strip.numPixels(); i=i+3) {
-        strip.setPixelColor(i+q, 0);        //turn every third pixel off
-      }
-    }
-  }
-}
-
-//Theatre-style crawling lights with rainbow effect
-void theaterChaseRainbow(uint8_t wait) {
-  for (int j=0; j < 256; j++) {     // cycle all 256 colors in the wheel
-    for (int q=0; q < 3; q++) {
-      for (uint16_t i=0; i < strip.numPixels(); i=i+3) {
-        strip.setPixelColor(i+q, Wheel( (i+j) % 255));    //turn every third pixel on
-      }
-      show();
-
-      delay(wait);
-
-      for (uint16_t i=0; i < strip.numPixels(); i=i+3) {
-        strip.setPixelColor(i+q, 0);        //turn every third pixel off
-      }
-    }
-  }
-}
 
 // Input a value 0 to 255 to get a color value.
 // The colours are a transition r - g - b - back to r.
