@@ -75,7 +75,6 @@ void setup() {
   state = rainbow;
   strip.begin();
   strip.show(); // Initialize all pixels to 'off'
-  // generate_rainbow_colors();
 }
 
 void loop() {
