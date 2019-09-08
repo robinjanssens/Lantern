@@ -17,11 +17,6 @@ const uint8_t cosinus_table[256] = { 255, 255, 255, 255, 254, 254, 254, 253, 253
 
 const uint8_t rainbow_wave_table[256] = { 0, 0, 0, 1, 1, 2, 3, 4, 5, 7, 9, 10, 12, 14, 17, 19, 21, 24, 27, 30, 33, 36, 39, 43, 46, 50, 54, 58, 62, 66, 70, 74, 78, 83, 87, 92, 96, 101, 105, 110, 115, 119, 124, 129, 133, 138, 143, 147, 152, 157, 161, 166, 170, 174, 179, 183, 187, 191, 195, 199, 203, 207, 210, 214, 217, 221, 224, 227, 230, 232, 235, 237, 240, 242, 244, 246, 247, 249, 250, 251, 252, 253, 254, 254, 255, 255, 255, 255, 254, 254, 253, 252, 251, 250, 249, 247, 246, 244, 242, 240, 237, 235, 232, 230, 227, 224, 221, 217, 214, 210, 207, 203, 199, 195, 191, 187, 183, 179, 174, 170, 166, 161, 157, 152, 147, 143, 138, 133, 129, 124, 119, 115, 110, 105, 101, 96, 92, 87, 83, 78, 74, 70, 66, 62, 58, 54, 50, 46, 43, 39, 36, 33, 30, 27, 24, 21, 19, 17, 14, 12, 10, 9, 7, 5, 4, 3, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
-// rainbow color tables
-uint8_t red_table[256];
-uint8_t green_table[256];
-uint8_t blue_table[256];
-
 // Parameter 1 = number of pixels in strip
 // Parameter 2 = Arduino pin number (most are valid)
 // Parameter 3 = pixel type flags, add together as needed:
@@ -30,14 +25,10 @@ uint8_t blue_table[256];
 //   NEO_GRB     Pixels are wired for GRB bitstream (most NeoPixel products)
 //   NEO_RGB     Pixels are wired for RGB bitstream (v1 FLORA pixels, not v2)
 //   NEO_RGBW    Pixels are wired for RGBW bitstream (NeoPixel RGBW products)
-// Adafruit_NeoPixel strip = Adafruit_NeoPixel(301, PIN, NEO_GRB + NEO_KHZ800);
-// Adafruit_NeoPixel remappedStrip = Adafruit_NeoPixel(300, PIN, NEO_GRB + NEO_KHZ800);
-Adafruit_NeoPixel strip(301, PIN, WS2812B);
-Adafruit_NeoPixel remappedStrip(300, PIN, WS2812B);
+// Adafruit_NeoPixel strip = Adafruit_NeoPixel(300, PIN, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel strip(300, PIN, WS2812B);
 
-uint8_t matrix[25][12][3]; // rows, columns, color
-
-Background background(&remappedStrip, &x_offset);
+Background background(&strip, &x_offset);
 
 // IMPORTANT: To reduce NeoPixel burnout risk, add 1000 uF capacitor across
 // pixel power leads, add 300 - 500 Ohm resistor on first pixel's data input
@@ -83,8 +74,7 @@ void setup() {
   // code
   state = rainbow;
   strip.begin();
-  remappedStrip.begin();
-  show(); // Initialize all pixels to 'off'
+  strip.show(); // Initialize all pixels to 'off'
   // generate_rainbow_colors();
 }
 
@@ -112,220 +102,4 @@ void loop() {
     state = rainbow;
     break;
   }
-}
-
-// ------------------------------
-// Obsolete
-// ------------------------------
-
-void rotation() {
-  for (uint8_t offset=0; offset<=255; offset++) {
-    for (uint16_t led=0; led<300; led++) {
-      uint8_t value = positions[led][1]+offset;  // 0 -> 255 (automatically modulo 256)
-      if (value>0 && value<128) {
-        uint8_t value2 = 255-cosinus_table[2*value];
-        remappedStrip.setPixelColor(led, strip.Color(0, 0, value2/8));
-      }
-      else {
-        remappedStrip.setPixelColor(led, strip.Color(0, 0, 0));
-      }
-    }
-    remappedStrip.show();
-    delay(5);
-  }
-}
-
-void rainbow_old() {
-  for (uint8_t offset=0; offset<=255; offset++) {
-    for (uint16_t led=0; led<300; led++) {
-      uint8_t value = positions[led][1]+offset;  // 0 -> 255 (automatically modulo 256)
-      uint8_t red, green, blue;
-      if (value<171) {
-        red = 255-cosinus_table[(int)round(1.5*value)%256];
-      }
-      else {
-        red = 0;
-      }
-      if (value>85) {
-        green = 255-cosinus_table[(int)round(1.5*(value-85))%256];
-      }
-      else {
-        green = 0;
-      }
-      if (value<85) {
-        blue =  255-cosinus_table[(int)round(1.5*(value+85))%256];
-      }
-      else if (value>171) {
-        blue =  255-cosinus_table[(int)round(1.5*(value-171))%256];
-      }
-      else {
-        blue = 0;
-      }
-      remappedStrip.setPixelColor(led, strip.Color(red/8, green/8, blue/8));
-    }
-    remappedStrip.show();
-    delay(5);
-  }
-}
-
-// void generate_rainbow_colors() {
-//   for (uint8_t value=0; value<=255; value++) {
-//     if (value<171) {
-//       red_table[value] = 255-cosinus_table[(int)round(1.5*value)%256];
-//     }
-//     else {
-//       red_table[value] = 0;
-//     }
-//     if (value>85) {
-//       green_table[value] = 255-cosinus_table[(int)round(1.5*(value-85))%256];
-//     }
-//     else {
-//       green_table[value] = 0;
-//     }
-//     if (value<85) {
-//       blue_table[value] =  255-cosinus_table[(int)round(1.5*(value+85))%256];
-//     }
-//     else if (value>171) {
-//       blue_table[value] =  255-cosinus_table[(int)round(1.5*(value-171))%256];
-//     }
-//     else {
-//       blue_table[value] = 0;
-//     }
-//     delay(1);
-//   }
-// }
-//
-// void rainbow2() {
-//   for (uint8_t offset=0; offset<=255; offset++) {
-//     for (uint16_t led=0; led<300; led++) {
-//       uint8_t value = positions[led][1]+offset;  // 0 -> 255 (automatically modulo 256)
-//       uint8_t red, green, blue;
-//       red = red_table[value];
-//       green = green_table[value];
-//       blue = blue_table[value];
-//       remappedStrip.setPixelColor(led, strip.Color(red/8, green/8, blue/8));
-//       delay(1);
-//     }
-//     remappedStrip.show();
-//     delay(3);
-//   }
-// }
-
-void rowtest(uint16_t duration) {
-  for (uint8_t row=0; row<=24; row++) {     // row iterator
-    for (uint8_t i=0; i<=24; i++) {     // row iterator
-      for (uint8_t j=0; j<=11; j++) {   // column iterator
-        if (i==row) {
-          matrix[i][j][1] = 0;
-          matrix[i][j][2] = 0;
-          matrix[i][j][3] = 127;
-        }
-        else {
-          matrix[i][j][1] = 0;
-          matrix[i][j][2] = 0;
-          matrix[i][j][3] = 0;
-        }
-      }
-    }
-    map();
-    show();
-    delay(duration);
-  }
-}
-void columntest(uint16_t duration) {
-  for (uint8_t column=0; column<=11; column++) {     // column iterator
-    for (uint8_t i=0; i<=24; i++) {     // row iterator
-      for (uint8_t j=0; j<=11; j++) {   // column iterator
-        if (j==column) {
-          matrix[i][j][1] = 0;
-          matrix[i][j][2] = 0;
-          matrix[i][j][3] = 127;
-        }
-        else {
-          matrix[i][j][1] = 0;
-          matrix[i][j][2] = 0;
-          matrix[i][j][3] = 0;
-        }
-      }
-    }
-    map();
-    show();
-    delay(duration);
-  }
-}
-
-
-
-//void test() {
-//  // Some example procedures showing how to display to the pixels:
-//  colorWipe(strip.Color(255, 0, 0), 50); // Red
-//  colorWipe(strip.Color(0, 255, 0), 50); // Green
-//  colorWipe(strip.Color(0, 0, 255), 50); // Blue
-////colorWipe(strip.Color(0, 0, 0, 255), 50); // White RGBW
-//  // Send a theater pixel chase in...
-//  theaterChase(strip.Color(127, 127, 127), 50); // White
-//  theaterChase(strip.Color(127, 0, 0), 50); // Red
-//  theaterChase(strip.Color(0, 0, 127), 50); // Blue
-//
-//  rainbow(20);
-//  rainbowCycle(20);
-//  theaterChaseRainbow(50);
-//}
-
-// Fill the dots one after the other with a color
-void colorWipe(uint32_t c, uint8_t wait) {
-  for(uint16_t i=0; i<strip.numPixels(); i++) {
-    strip.setPixelColor(i, c);
-    show();
-    delay(wait);
-  }
-}
-
-//void rainbow(uint8_t wait) {
-//  uint16_t i, j;
-//
-//  for(j=0; j<256; j++) {
-//    for(i=0; i<strip.numPixels(); i++) {
-//      strip.setPixelColor(i, Wheel((i+j) & 255));
-//    }
-//    show();
-//    delay(wait);
-//  }
-//}
-
-// Input a value 0 to 255 to get a color value.
-// The colours are a transition r - g - b - back to r.
-uint32_t Wheel(byte WheelPos) {
-  WheelPos = 255 - WheelPos;
-  if(WheelPos < 85) {
-    return strip.Color(255 - WheelPos * 3, 0, WheelPos * 3);
-  }
-  if(WheelPos < 170) {
-    WheelPos -= 85;
-    return strip.Color(0, WheelPos * 3, 255 - WheelPos * 3);
-  }
-  WheelPos -= 170;
-  return strip.Color(WheelPos * 3, 255 - WheelPos * 3, 0);
-}
-
-void map() {
-  uint16_t led = 0;
-  for (uint8_t i=0; i<=24; i++) {    // row iterator
-    for (uint8_t j=0; j<=11; j++) {  // column iterator
-      strip.setPixelColor(led, strip.Color(matrix[i][j][1], matrix[i][j][2], matrix[i][j][3]));
-      led++;
-    }
-  }
-}
-
-void show() {
-  for (uint16_t i=0; i<remappedStrip.numPixels(); i++) {
-    if(i<150) {
-      remappedStrip.setPixelColor(i, strip.getPixelColor(i));
-    }
-    else {
-      remappedStrip.setPixelColor(i, strip.getPixelColor(i+1));
-    }
-  }
-  remappedStrip.show();
 }
