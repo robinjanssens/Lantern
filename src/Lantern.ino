@@ -106,4 +106,5 @@ void loop() {
     state = rainbow;
     break;
   }
+  strip.show();
 }

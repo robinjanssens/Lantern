@@ -22,7 +22,6 @@ void Background::rainbow() {
     // clear flashes_overlay
     flashes_overlay[0] = 0;
   }
-  strip->show();
 }
 
 void Background::police() {
@@ -38,7 +37,6 @@ void Background::police() {
       strip->setPixelColor(led, strip->Color(value2/8, 0, 0));
     }
   }
-  strip->show();
 }
 
 void Background::fire() {
@@ -47,14 +45,12 @@ void Background::fire() {
     rand = random(10,100);
     strip->setPixelColor(led, strip->Color(rand, rand*0.75, 0));
   }
-  strip->show();
 }
 
 void Background::solid(uint8_t red, uint8_t green, uint8_t blue) {
   for (uint16_t led=0; led<300; led++) {
     strip->setPixelColor(led, strip->Color(red, green, blue));
   }
-  strip->show();
 }
 
 // ------------------------------
@@ -79,7 +75,6 @@ void Background::flashes() {
       }
     }
   }
-  strip->show();
 }
 
 // ------------------------------
