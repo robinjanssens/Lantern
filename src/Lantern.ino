@@ -6,7 +6,7 @@
 
 SYSTEM_THREAD(ENABLED);
 
-enum State { rainbow, police, fire, off } state;
+enum State { rainbow, police, fire, flashes, off } state;
 
 uint8_t x_offset = 0; // automatically rolls over at 256.
 
@@ -47,6 +47,11 @@ int setFire(String userInput) {
   return 0;
 }
 
+int setFlashes(String userInput) {
+  state = flashes;
+  return 0;
+}
+
 int setOff(String userInput) {
   state = off;
   return 0;
@@ -62,6 +67,7 @@ void setup() {
   Particle.function("on", setOn);
   Particle.function("police", setPolice);
   Particle.function("fire", setFire);
+  Particle.function("flashes", setFlashes);
   Particle.function("off", setOff);
   Particle.variable("state",state);
   // code
@@ -74,6 +80,7 @@ void loop() {
   switch (state) {
   case rainbow:
     background.rainbow();
+    // background.flashes();
     x_offset++; // increment x offset
     delay(5);   // wait for 5ms
     break;
@@ -85,6 +92,11 @@ void loop() {
   case fire:
     background.fire();
     delay(random(20));
+    break;
+  case flashes:
+    background.solid(0,0,0);
+    background.flashes();
+    delay(5);   // wait for 5ms
     break;
   case off:
     background.solid(0,0,0);
