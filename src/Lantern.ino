@@ -32,7 +32,7 @@ Background background(&strip, &x_offset);
 // External accessable functions
 // ------------------------------
 
-int setOn(String userInput) {
+int setRainbow(String userInput) {
   state = rainbow;
   return 0;
 }
@@ -64,7 +64,7 @@ int setOff(String userInput) {
 void setup() {
   // register the cloud function
   waitUntil(Particle.connected);
-  Particle.function("on", setOn);
+  Particle.function("rainbow", setRainbow);
   Particle.function("police", setPolice);
   Particle.function("fire", setFire);
   Particle.function("flashes", setFlashes);
