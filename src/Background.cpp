@@ -1,9 +1,10 @@
 #include "Background.h"
 #include <neopixel.h>
 
-Background::Background(Adafruit_NeoPixel* strip, uint8_t* x_offset) {
+Background::Background(Adafruit_NeoPixel* strip, uint8_t* x_offset, uint8_t* y_offset) {
   this->strip = strip;
   this->x_offset = x_offset;
+  this->y_offset = y_offset;
 }
 
 // ------------------------------
@@ -21,6 +22,20 @@ void Background::rainbow() {
     strip->setPixelColor(led, strip->Color(red/8, green/8, blue/8));
     // clear flashes_overlay
     flashes_overlay[0] = 0;
+  }
+}
+
+void Background::plasma() {
+  uint8_t x_value, y_value;
+  uint8_t red, blue;
+  const uint8_t min_value = 16;
+  const uint8_t max_value = 255;
+  for (uint16_t led=0; led<strip->numPixels(); led++) {
+    y_value  = positions[led][0]+(*y_offset);  // 0 -> 255 (automatically modulo 256)
+    x_value  = positions[led][1]+(*x_offset);  // 0 -> 255 (automatically modulo 256)
+    red   = min_value+cosinus_table[y_value]*(max_value-min_value)/255; // min_value->max_value
+    blue  = min_value+cosinus_table[x_value]*(max_value-min_value)/255; // min_value->max_value
+    strip->setPixelColor(led, strip->Color(red/8, 0, blue/8));
   }
 }
 

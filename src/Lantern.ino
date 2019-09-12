@@ -6,9 +6,10 @@
 
 SYSTEM_THREAD(ENABLED);
 
-enum State { rainbow, police, fire, flashes, off } state;
+enum State { rainbow, plasma, police, fire, flashes, off } state;
 
-uint8_t x_offset = 0; // automatically rolls over at 256.
+uint8_t x_offset = 0; // automatically rolls over at 256
+uint8_t y_offset = 0; // automatically rolls over at 256
 
 // Parameter 1 = number of pixels in strip
 // Parameter 2 = Arduino pin number (most are valid)
@@ -21,7 +22,7 @@ uint8_t x_offset = 0; // automatically rolls over at 256.
 // Adafruit_NeoPixel strip = Adafruit_NeoPixel(300, PIN, NEO_GRB + NEO_KHZ800);
 Adafruit_NeoPixel strip(300, PIN, WS2812B);
 
-Background background(&strip, &x_offset);
+Background background(&strip, &x_offset, &y_offset);
 
 // IMPORTANT: To reduce NeoPixel burnout risk, add 1000 uF capacitor across
 // pixel power leads, add 300 - 500 Ohm resistor on first pixel's data input
@@ -34,6 +35,11 @@ Background background(&strip, &x_offset);
 
 int setRainbow(String userInput) {
   state = rainbow;
+  return 0;
+}
+
+int setPlasma(String userInput) {
+  state = plasma;
   return 0;
 }
 
@@ -65,6 +71,7 @@ void setup() {
   // register the cloud function
   waitUntil(Particle.connected);
   Particle.function("rainbow", setRainbow);
+  Particle.function("plasma", setPlasma);
   Particle.function("police", setPolice);
   Particle.function("fire", setFire);
   Particle.function("flashes", setFlashes);
@@ -82,6 +89,12 @@ void loop() {
     background.rainbow();
     // background.flashes();
     x_offset++; // increment x offset
+    delay(5);   // wait for 5ms
+    break;
+  case plasma:
+    background.plasma();
+    x_offset++; // increment x offset
+    y_offset++; // increment y offset
     delay(5);   // wait for 5ms
     break;
   case police:
