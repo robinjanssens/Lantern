@@ -5,6 +5,9 @@ Background::Background(Adafruit_NeoPixel* strip, uint8_t* x_offset, uint8_t* y_o
   this->strip = strip;
   this->x_offset = x_offset;
   this->y_offset = y_offset;
+  for (uint16_t led=0; led<strip->numPixels(); led++) {
+    flashes_overlay[0] = 0; // clear flashes_overlay
+  }
 }
 
 // ------------------------------
@@ -20,8 +23,6 @@ void Background::rainbow() {
     green=rainbow_wave_table[(value+85)%256];
     blue=rainbow_wave_table[(value+171)%256];
     strip->setPixelColor(led, strip->Color(red/8, green/8, blue/8));
-    // clear flashes_overlay
-    flashes_overlay[0] = 0;
   }
 }
 

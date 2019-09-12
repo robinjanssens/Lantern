@@ -78,7 +78,7 @@ void setup() {
   Particle.function("off", setOff);
   Particle.variable("state",state);
   // code
-  state = rainbow;
+  state = rainbow; // default state on startup
   strip.begin();
   strip.show(); // Initialize all pixels to 'off'
 }
