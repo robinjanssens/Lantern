@@ -40,10 +40,11 @@ void Background::police() {
 }
 
 void Background::fire() {
-  uint8_t rand;
+  uint8_t rand, value;
   for (uint16_t led=0; led<strip->numPixels(); led++) {
     rand = random(10,100);
-    strip->setPixelColor(led, strip->Color(rand, rand*0.75, 0));
+    value = rand*positions[led][0]/255;
+    strip->setPixelColor(led, strip->Color(value, value*0.75, 0));
   }
 }
 
