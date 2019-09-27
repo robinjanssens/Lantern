@@ -34,8 +34,8 @@ void Background::plasma() {
   for (uint16_t led=0; led<strip->numPixels(); led++) {
     y_value  = positions[led][0]+(*y_offset);  // 0 -> 255 (automatically modulo 256)
     x_value  = positions[led][1]+(*x_offset);  // 0 -> 255 (automatically modulo 256)
-    red   = min_value+cosinus_table[y_value]*(max_value-min_value)/255; // min_value->max_value
-    blue  = min_value+cosinus_table[x_value]*(max_value-min_value)/255; // min_value->max_value
+    red   = min_value+cosine_table[y_value]*(max_value-min_value)/255; // min_value->max_value
+    blue  = min_value+cosine_table[x_value]*(max_value-min_value)/255; // min_value->max_value
     strip->setPixelColor(led, strip->Color(red/8, 0, blue/8));
   }
 }
@@ -45,11 +45,11 @@ void Background::police() {
   for (uint16_t led=0; led<strip->numPixels(); led++) {
     value = positions[led][1]+(*x_offset);  // 0 -> 255 (automatically modulo 256)
     if (value>0 && value<128) {
-      value2 = 255-cosinus_table[2*value];
+      value2 = 255-cosine_table[2*value];
       strip->setPixelColor(led, strip->Color(0, 0, value2/8));
     }
     else {
-      value2 = 255-cosinus_table[(2*value)%256];
+      value2 = 255-cosine_table[(2*value)%256];
       strip->setPixelColor(led, strip->Color(value2/8, 0, 0));
     }
   }
